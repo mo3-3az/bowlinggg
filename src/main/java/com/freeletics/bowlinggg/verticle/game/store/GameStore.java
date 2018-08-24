@@ -6,7 +6,7 @@ public interface GameStore {
 
     Game newGame();
 
-    Game deleteGame();
+    Game deleteGame(String id);
 
     Game updateGame(Game game);
 
