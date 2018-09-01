@@ -13,6 +13,10 @@ public enum GameManagerAction {
     INVALID;
 
     public static GameManagerAction fromHttpMethod(String httpMethod) {
+        if (httpMethod == null || httpMethod.trim().isEmpty()) {
+            throw new IllegalArgumentException("httpMethod is blank!");
+        }
+
         switch (HttpMethod.valueOf(httpMethod)) {
             case GET:
                 return GET_GAME;

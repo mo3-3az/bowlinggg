@@ -1,10 +1,9 @@
 package com.freeletics.bowlinggg.verticle.game.store;
 
 import com.freeletics.bowlinggg.verticle.game.model.Game;
-import org.apache.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -12,16 +11,12 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class InMemGameStore implements GameStore {
 
-    private static final Logger LOG = Logger.getLogger(InMemGameStore.class);
-
-    private static final String GAMES_MAP = "games";
-
     private Map<String, Game> games;
 
     private AtomicLong idSequence;
 
     public InMemGameStore() {
-        games = new HashMap<>();
+        games = new ConcurrentHashMap<>();
         idSequence = new AtomicLong(0);
     }
 

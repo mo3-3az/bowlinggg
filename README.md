@@ -9,7 +9,9 @@ Run `Application.main()` or java -jar target/bowlinggg-1.0-SNAPSHOT-fat.jar
 
 ###API
 Start new game
-POST /v1/games -> Response: CREATED(201), Empty body.
+POST /v1/games
+    Successful -> Response: CREATED(201), Empty body.
+    Failure (Error) -> Response: INTERNAL_SERVER_ERROR(503), Error object as json string.
 
 Update game
 PUT /v1/games/{id}/{pinsKnocked} 

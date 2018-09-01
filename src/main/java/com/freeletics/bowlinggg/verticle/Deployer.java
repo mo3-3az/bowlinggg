@@ -9,6 +9,7 @@ import io.vertx.core.json.JsonObject;
 import org.apache.log4j.Logger;
 
 /**
+ * This verticle will deploy all the other verticles.
  * @author Moath
  */
 public class Deployer extends AbstractVerticle {

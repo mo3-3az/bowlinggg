@@ -10,6 +10,10 @@ import io.vertx.core.eventbus.Message;
 import org.apache.log4j.Logger;
 
 /**
+ * This will receive actions related to the game logic.
+ * Basically, it will register a consumer that will listen on
+ * a specific address and handle those messages.
+ *
  * @author Moath
  */
 public class GameManager extends AbstractVerticle {
@@ -70,9 +74,9 @@ public class GameManager extends AbstractVerticle {
                 }
 
                 event.reply(gameToUpdate.getScore());
-                Integer pinsNumber;
+                int pinsNumber;
                 try {
-                    pinsNumber = Integer.valueOf(pins);
+                    pinsNumber = Integer.parseInt(pins);
                 } catch (NumberFormatException e) {
                     event.fail(FAILURE_CODE_INVALID_INPUT, "Invalid pins value!");
                     return;
@@ -86,7 +90,6 @@ public class GameManager extends AbstractVerticle {
             default:
                 event.fail(FAILURE_CODE_INVALID_INPUT, "Invalid action!");
         }
-
     }
 
     private void chain(Future<Void> startFuture, AsyncResult<Void> newGameConsumer) {

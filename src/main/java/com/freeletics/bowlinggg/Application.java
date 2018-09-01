@@ -6,6 +6,8 @@ import io.vertx.core.Vertx;
 import org.apache.log4j.Logger;
 
 /**
+ * Main entry point.
+ *
  * @author Moath
  */
 public class Application {
