@@ -3,7 +3,7 @@ package com.freeletics.bowlinggg.verticle.game.model;
 public enum FrameType {
     STRIKE, SPARE, NORMAL;
 
-    public boolean isStirke() {
+    public boolean isStrike() {
         return this == FrameType.STRIKE;
     }
 
@@ -11,7 +11,4 @@ public enum FrameType {
         return this == FrameType.SPARE;
     }
 
-    public boolean isNormal() {
-        return this == FrameType.NORMAL;
-    }
 }

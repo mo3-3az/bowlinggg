@@ -16,11 +16,9 @@ import static com.jayway.restassured.RestAssured.get;
 @RunWith(VertxUnitRunner.class)
 public class ApplicationTest extends VertxBasedTest {
 
-    private static final String LOCALHOST = "http://localhost/";
-
     @BeforeClass
     public static void setup(TestContext testContext) throws IOException {
-        startVertx(testContext);
+        start(testContext);
     }
 
     @Test
@@ -33,7 +31,7 @@ public class ApplicationTest extends VertxBasedTest {
 
     @AfterClass
     public static void tearDown(TestContext testContext) {
-        stopVertx(testContext);
+        stop(testContext);
     }
 
 }

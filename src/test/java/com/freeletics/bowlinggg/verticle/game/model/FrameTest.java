@@ -40,6 +40,38 @@ public class FrameTest {
         Assert.assertEquals(FrameType.NORMAL, frame.getFrameType());
     }
 
+    @Test
+    public void getAttemptPins() {
+        frame.knockPins(1);
+        frame.knockPins(2);
+
+        Assert.assertEquals(1, frame.getPinsOnFirstAttempt());
+        Assert.assertEquals(2, frame.getPinsOnSecondAttempt());
+    }
+
+    @Test
+    public void gettingAStrikeEndsTheFrame() {
+        frame.knockPins(Frame.TOTAL_PINS);
+
+        Assert.assertTrue("The frame has ended!", frame.hasEnded());
+    }
+
+    @Test
+    public void gettingASpareEndsTheFrame() {
+        frame.knockPins(5);
+        frame.knockPins(5);
+
+        Assert.assertTrue("The frame has ended!", frame.hasEnded());
+    }
+
+    @Test
+    public void twoTriesWithPinsLeftEndTheFrame() {
+        frame.knockPins(4);
+        frame.knockPins(4);
+
+        Assert.assertTrue("The frame has ended!", frame.hasEnded());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void frameEndsAfterTwoTries() {
         frame.knockPins(0);
@@ -51,5 +83,4 @@ public class FrameTest {
     public void knockingMoreThanTotalPinsIsNotAllowed() {
         frame.knockPins(Frame.TOTAL_PINS + 1);
     }
-
 }

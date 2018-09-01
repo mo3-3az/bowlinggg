@@ -3,23 +3,23 @@ package com.freeletics.bowlinggg.verticle.game.model;
 /**
  * @author Moath
  */
-public class Frame {
+class Frame {
 
-    public static final short TOTAL_PINS = 10;
-    public static final short TOTAL_TRIES = 2;
+    static final short TOTAL_PINS = 10;
+    private static final short TOTAL_ATTEMPTS = 2;
 
     private int pinsOnSecondAttempt;
     private int pinsOnFirstAttempt;
     private int attempt;
     private FrameType frameType = FrameType.NORMAL;
 
-    public void knockPins(int knockedPins) {
+    void knockPins(int knockedPins) {
         if (knockedPins > TOTAL_PINS) {
             throw new IllegalArgumentException("There are only " + TOTAL_PINS + " pins!");
         }
 
-        if (attempt == TOTAL_TRIES) {
-            throw new IllegalStateException("There are only " + TOTAL_TRIES + " tries!");
+        if (attempt == TOTAL_ATTEMPTS) {
+            throw new IllegalStateException("There are only " + TOTAL_ATTEMPTS + " attempts!");
         }
 
         attempt++;
@@ -27,6 +27,7 @@ public class Frame {
             pinsOnFirstAttempt = knockedPins;
             if (knockedPins == TOTAL_PINS) {
                 frameType = FrameType.STRIKE;
+                attempt++;
             }
 
             return;
@@ -39,16 +40,28 @@ public class Frame {
         }
     }
 
-    public FrameType getFrameType() {
+    FrameType getFrameType() {
         return frameType;
     }
 
-    public int getPinsOnSecondAttempt() {
+    boolean isStrike() {
+        return frameType.isStrike();
+    }
+
+    boolean isSpare() {
+        return frameType.isSpare();
+    }
+
+    int getPinsOnSecondAttempt() {
         return pinsOnSecondAttempt;
     }
 
-    public int getPinsOnFirstAttempt() {
+    int getPinsOnFirstAttempt() {
         return pinsOnFirstAttempt;
+    }
+
+    boolean hasEnded() {
+        return attempt == TOTAL_ATTEMPTS;
     }
 
 }

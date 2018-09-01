@@ -4,6 +4,7 @@ import com.freeletics.bowlinggg.config.Config;
 import com.freeletics.bowlinggg.verticle.Deployer;
 import com.jayway.restassured.RestAssured;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 
@@ -12,11 +13,12 @@ import java.net.ServerSocket;
 
 public class VertxBasedTest {
 
-    private static final String LOCALHOST = "http://localhost/";
+    private static final String LOCALHOST = "http://localhost";
 
-    protected static Vertx vertx = Vertx.vertx();
+    protected static Vertx vertx;
 
-    protected static void startVertx(TestContext testContext) throws IOException {
+    protected static void start(TestContext testContext) throws IOException {
+        vertx = Vertx.vertx();
         ServerSocket socket = new ServerSocket(0);
         int port = socket.getLocalPort();
         socket.close();
@@ -24,9 +26,16 @@ public class VertxBasedTest {
 
         RestAssured.baseURI = LOCALHOST;
         RestAssured.port = port;
+        testContext.async().complete();
     }
 
-    protected static void stopVertx(TestContext testContext) {
+    protected static void stop(TestContext testContext) {
         RestAssured.reset();
+        testContext.async().complete();
+        vertx.close();
+    }
+
+    protected EventBus eventBus() {
+        return vertx.eventBus();
     }
 }

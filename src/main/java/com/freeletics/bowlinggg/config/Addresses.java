@@ -5,10 +5,17 @@ package com.freeletics.bowlinggg.config;
  */
 public interface Addresses {
 
+    String EVENT_BUS_MSG_HEADER_ACTION = "action";
+
+    String HEALTH_CHECK = "/healthcheck";
     String API_VERSION = "/v1";
 
-    String GAMES_ENDPOINT = API_VERSION + "/games";
-    String HEALTH_CHECK = "/healthcheck";
+    String PARAM_ID = "id";
+    String PATH_PART_PARAM_ID = "/:" + PARAM_ID;
+    String PARAM_PINS = "pins";
+    String PATH_PART_PARAM_PINS = "/:" + PARAM_PINS;
 
+    String GAMES_ENDPOINT = API_VERSION + "/games";
+    String GAMES_ENDPOINT_FULL = GAMES_ENDPOINT + PATH_PART_PARAM_ID;
 
 }

@@ -1,18 +1,23 @@
 package com.freeletics.bowlinggg.verticle.game.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.vertx.core.json.JsonObject;
 
 /**
  * @author Moath
  */
 public class Game {
 
+    static final short TOTAL_FRAMES = 10;
+    private static final short MAX_FRAMES = 12;
+
     private String id;
+
     private int score;
-    private List<Frame> frames = new ArrayList<>();
-    private int throwCount;
-    private FrameType lastFrameType;
+    private int bonus;
+    private int framesCount;
+
+    private Frame currentFrame = new Frame();
+    private FrameType currentFrameType = currentFrame.getFrameType();
 
     public Game(String id) {
         this.id = id;
@@ -26,68 +31,68 @@ public class Game {
         return score;
     }
 
-    public List<Frame> getFrames() {
-        return frames;
+    public void pinsKnocked(int pins) {
+        score += pins;
+        addPinsToPreviousFrame(pins);
+
+        currentFrame.knockPins(pins);
+
+        addBonusFromPreviousFrame();
+
+        checkIfFrameHasEnded();
     }
 
-    public void update(int pins) {
-        final Frame frame;
-        if (newFrame()) {
-            frame = new Frame();
-            frames.add(frame);
-        } else {
-            frame = getLastFrame();
+    private void addBonusFromPreviousFrame() {
+        if (currentFrame.isStrike() && framesCount < TOTAL_FRAMES) {
+            bonus += 2;
+        } else if (currentFrame.isSpare() && framesCount < TOTAL_FRAMES) {
+            bonus++;
+        }
+    }
+
+    private void checkIfFrameHasEnded() {
+        if (currentFrame.hasEnded()) {
+            currentFrameType = currentFrame.getFrameType();
+            currentFrame = new Frame();
+            framesCount++;
         }
 
-        frame.knockPins(pins);
-
-        if (newFrame()) {
-            score += frame.getPinsOnFirstAttempt();
-        } else {
-            score += frame.getPinsOnSecondAttempt();
+        if (bonus < 0) {
+            bonus = 0;
         }
+    }
 
-        //Update
-        frames.set(frames.size() - 1, frame);
-
-        lastFrameType = frame.getFrameType();
-        if (frame.getFrameType().isStirke()) {
-            endFrame();
+    private void addPinsToPreviousFrame(int pins) {
+        if (bonus == 0) {
             return;
         }
 
-        throwCount++;
-        updateScoreFromPreviousFrame();
-    }
-
-    private void endFrame() {
-        throwCount += 2;
-    }
-
-    private boolean newFrame() {
-        return throwCount % 2 == 0;
-    }
-
-    private void updateScoreFromPreviousFrame() {
-        if (frames.size() == 1) {
-            return;
+        if (framesCount < Game.MAX_FRAMES - 1) {//FRAME BEFORE LAST FRAME
+            score += pins;
         }
 
-        if (lastFrameType.isStirke() || lastFrameType.isSpare()) {
-            score += getPreviousFrame().getPinsOnFirstAttempt();
+        if (bonus > 2 && framesCount < Game.TOTAL_FRAMES) { //LAST FRAME
+            score += pins;
         }
 
-        if (lastFrameType.isStirke()) {
-            score += getPreviousFrame().getPinsOnSecondAttempt();
-        }
+        bonus--;
     }
 
-    private Frame getLastFrame() {
-        return frames.get(frames.size() - 1);
+    FrameType getCurrentFrameType() {
+        return currentFrameType;
     }
 
-    private Frame getPreviousFrame() {
-        return frames.get(frames.size() - 2);
+    int getFramesCount() {
+        return framesCount;
+    }
+
+    public String toJsonString() {
+        return new JsonObject().put("game"
+                , new JsonObject()
+                        .put("score", score)
+                        .put("frame", currentFrameType.name().toLowerCase())
+                        .put("frames", framesCount))
+                .encodePrettily();
     }
 
 }

@@ -2,7 +2,13 @@ package com.freeletics.bowlinggg.verticle.server;
 
 import com.freeletics.bowlinggg.VertxBasedTest;
 import com.freeletics.bowlinggg.config.Addresses;
+import com.jayway.restassured.response.ExtractableResponse;
+import com.jayway.restassured.response.Response;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.TestOptions;
+import io.vertx.ext.unit.TestSuite;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.apache.http.HttpStatus;
 import org.junit.AfterClass;
@@ -12,7 +18,7 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 
-import static com.jayway.restassured.RestAssured.post;
+import static com.jayway.restassured.RestAssured.*;
 
 /**
  * @author Moath
@@ -20,78 +26,58 @@ import static com.jayway.restassured.RestAssured.post;
 @RunWith(VertxUnitRunner.class)
 public class WebServerTest extends VertxBasedTest {
 
-    private static final String FIRST_GAME_ID = "1";
-
     @BeforeClass
     public static void setup(TestContext testContext) throws IOException {
-        startVertx(testContext);
+        start(testContext);
     }
 
     @Test
-    public void name() {
-        post(Addresses.GAMES_ENDPOINT)
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK);
+    public void testWebServer(TestContext testContext) {
+        Async async1 = testContext.async();
+        Async async2 = testContext.async();
+        Async async3 = testContext.async();
+        Async async4 = testContext.async();
+
+        TestSuite.create(getClass().getSimpleName())
+                .test("startNewGame", event -> {
+                    final ExtractableResponse<Response> response = post(Addresses.GAMES_ENDPOINT)
+                            .then()
+                            .extract();
+                    testContext.assertEquals(HttpStatus.SC_CREATED, response.statusCode());
+                    testContext.assertEquals("", response.asString());
+                    async1.complete();
+                })
+                .test("updateGame", event -> {
+                    async1.awaitSuccess();
+                    final ExtractableResponse<Response> response = put("/v1/games/1/1")
+                            .then().extract();
+                    testContext.assertEquals(HttpStatus.SC_NO_CONTENT, response.statusCode());
+                    testContext.assertEquals("", response.asString());
+                    async2.complete();
+                })
+                .test("getGame", event -> {
+                    async2.awaitSuccess();
+                    final ExtractableResponse<Response> response = get("/v1/games/1")
+                            .then().extract();
+                    testContext.assertEquals(HttpStatus.SC_OK, response.statusCode());
+                    testContext.assertEquals(1, new JsonObject(response.asString()).getJsonObject("game").getInteger("score"));
+                    async3.complete();
+                })
+                .test("deleteGame", event -> {
+                    async3.awaitSuccess();
+                    final ExtractableResponse<Response> response = delete("/v1/games/1")
+                            .then().extract();
+                    testContext.assertEquals(HttpStatus.SC_NO_CONTENT, response.statusCode());
+                    testContext.assertEquals("", response.asString());
+                    async4.complete();
+                })
+                .run(vertx, new TestOptions());
+
+        async4.awaitSuccess();
     }
 
     @AfterClass
     public static void tearDown(TestContext testContext) {
-        stopVertx(testContext);
+        stop(testContext);
     }
-
-    //    @BeforeClass
-//    public static void setUp() {
-//        RestAssured.baseURI = "http://localhost";
-//        RestAssured.port = Integer.getInteger("http.port", 8080);
-//    }
-//
-//    @Test
-//    public void startNewGame() {
-//        post(Addresses.GAMES_ENDPOINT)
-//                .then()
-//                .assertThat()
-//                .statusCode(HttpStatus.SC_CREATED)
-//                .body(getGame().toJsonString(), equalTo(""));
-//    }
-//
-//    @Test
-//    public void getGameById() {
-//        get(Addresses.GAMES_ENDPOINT + "/{id}", FIRST_GAME_ID)
-//                .then()
-//                .assertThat()
-//                .statusCode(HttpStatus.SC_OK)
-//                .body(getGame().toJsonString(), equalTo(""));
-//    }
-//
-//    @Test
-//    public void updateGame() {
-//        put(Addresses.GAMES_ENDPOINT + "/{id}", FIRST_GAME_ID)
-//                .then()
-//                .assertThat()
-//                .statusCode(HttpStatus.SC_NO_CONTENT)
-//                .body(getGame().toJsonString(), equalTo(""));
-//    }
-//
-//    @Test
-//    public void deleteGame() {
-//        delete(Addresses.GAMES_ENDPOINT + "/{id}", FIRST_GAME_ID)
-//                .then()
-//                .assertThat()
-//                .statusCode(HttpStatus.SC_NO_CONTENT);
-//
-//        get(Addresses.GAMES_ENDPOINT + "/{id}", FIRST_GAME_ID)
-//                .then()
-//                .assertThat()
-//                .statusCode(HttpStatus.SC_NOT_FOUND);
-//    }
-//
-//    @AfterClass
-//    public static void tearDown() {
-//        RestAssured.reset();
-//    }
-//
-//    private Game getGame() {
-//        return new Game();
-//    }
 }
