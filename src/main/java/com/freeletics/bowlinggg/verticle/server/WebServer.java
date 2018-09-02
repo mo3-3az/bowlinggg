@@ -44,6 +44,8 @@ public class WebServer extends AbstractVerticle {
     private static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     private static final String MSG_INVALID_PINS_VALUE = "Invalid pins value!";
     private static final String MSG_INVALID_ID_VALUE = "Invalid id value!";
+    static final String JSON_KEY_ERROR = "error";
+    private static final String JSON_KEY_MSG = "msg";
 
     @Override
     public void start(Future<Void> future) {
@@ -64,7 +66,7 @@ public class WebServer extends AbstractVerticle {
                         LOG.info(getClass().getSimpleName() + " was deployed successfully.");
                         future.complete();
                     } else {
-                        LOG.error(getClass().getSimpleName() + " wasn't deployed successfully.", result .cause());
+                        LOG.error(getClass().getSimpleName() + " wasn't deployed successfully.", result.cause());
                         future.fail(result.cause());
                     }
                 });
@@ -72,6 +74,8 @@ public class WebServer extends AbstractVerticle {
 
     private Handler<RoutingContext> requestHandler() {
         return routingContext -> {
+            routingContext.response().putHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON);
+
             final HttpServerRequest request = routingContext.request();
             final HttpMethod method = request.method();
             final DeliveryOptions deliveryOptions = new DeliveryOptions();
@@ -102,7 +106,6 @@ public class WebServer extends AbstractVerticle {
     }
 
     private void reply(RoutingContext routingContext, AsyncResult<Message<Object>> event) {
-        routingContext.response().putHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON);
         if (event.failed()) {
             final ReplyException cause = (ReplyException) event.cause();
             replyWithError(routingContext.response(), cause.failureCode(), cause.getMessage());
@@ -143,8 +146,8 @@ public class WebServer extends AbstractVerticle {
 
     private String getError(String message) {
         return new JsonObject()
-                .put("error", true)
-                .put("msg", message)
+                .put(JSON_KEY_ERROR, true)
+                .put(JSON_KEY_MSG, message)
                 .encodePrettily();
     }
 
