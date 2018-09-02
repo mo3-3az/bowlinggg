@@ -28,3 +28,10 @@ Delete game <br/>
 DELETE /v1/games/{id}/{pinsKnocked} <br/>
     Successful -> Response: NO_CONTENT(204), Empty body. <br/>
     Failure (Invalid id) -> Response: NO_FOUND(404), Error object as json string. <br/>
+    
+###Unit Test & Test Coverage
+Test using JUnit 4 & Vert.x<br/>
+Run `mvn test`<br/>
+<br/>
+Coverage report by JaCoCo<br/>
+`target/site/jacoco/index.html`<br/>

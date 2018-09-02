@@ -92,7 +92,7 @@ public class GameTest {
     public void strikeForEveryFrame() {
         for (int i = 0; i < Game.TOTAL_FRAMES; i++) {
             game.knockPins(Frame.TOTAL_PINS);
-            Assert.assertTrue("Frame is a strike!", game.getCurrentFrameType().isStrike());
+            Assert.assertEquals(FrameType.STRIKE, game.getCurrentFrameType());
         }
 
         Assert.assertEquals(Game.TOTAL_FRAMES, game.getFramesCount());
@@ -110,7 +110,7 @@ public class GameTest {
     public void strikeForEveryFrameExceptSpareOnLast() {
         for (int i = 0; i < Game.TOTAL_FRAMES - 1; i++) {
             game.knockPins(Frame.TOTAL_PINS);
-            Assert.assertTrue("Frame is a strike!", game.getCurrentFrameType().isStrike());
+            Assert.assertEquals(FrameType.STRIKE, game.getCurrentFrameType());
         }
 
         Assert.assertEquals(Game.TOTAL_FRAMES - 1, game.getFramesCount());

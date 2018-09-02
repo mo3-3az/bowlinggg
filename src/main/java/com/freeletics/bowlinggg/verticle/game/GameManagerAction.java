@@ -12,6 +12,9 @@ public enum GameManagerAction {
     UPDATE_GAME,
     INVALID;
 
+    /**
+     * This will translate an http method to an action.
+     */
     public static GameManagerAction fromHttpMethod(String httpMethod) {
         if (httpMethod == null || httpMethod.trim().isEmpty()) {
             throw new IllegalArgumentException("httpMethod is blank!");
