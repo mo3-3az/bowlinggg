@@ -1,5 +1,6 @@
 package com.freeletics.bowlinggg.verticle.game.model;
 
+import com.freeletics.bowlinggg.verticle.game.exception.GameHasFinishedException;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -37,13 +38,30 @@ public class Game {
     }
 
     public void knockPins(int pins) {
+        checkIfGameHasFinished();
+
         calculateScore(pins);
 
         currentFrame.knockPins(pins);
 
         addBonusFromCurrentFrame();
 
-        checkIfFrameHasEnded();
+        checkIfCurrentFrameHasEnded();
+    }
+
+    private void checkIfGameHasFinished() {
+        if (framesCount == MAX_FRAMES) {
+            throw new GameHasFinishedException("Game has finished! Maximum frames to play " + MAX_FRAMES);
+        }
+
+        if (framesCount == TOTAL_FRAMES && currentFrameType == FrameType.NORMAL) {
+            throw new GameHasFinishedException("Game has finished at " + TOTAL_FRAMES + " frames!");
+        }
+
+        if (framesCount == TOTAL_FRAMES + 1 && currentFrameType != FrameType.STRIKE) {
+            throw new GameHasFinishedException("Game has finished at " + TOTAL_FRAMES + " frames!");
+        }
+
     }
 
     private void addBonusFromCurrentFrame() {
@@ -58,8 +76,8 @@ public class Game {
         }
     }
 
-    private void checkIfFrameHasEnded() {
-        if (currentFrame.hasEnded()) {
+    private void checkIfCurrentFrameHasEnded() {
+        if (currentFrame.hasEnded() || (framesCount == TOTAL_FRAMES && currentFrameType == FrameType.SPARE)) {
             currentFrameType = currentFrame.getFrameType();
             currentFrame = new Frame();
             framesCount++;

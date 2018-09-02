@@ -14,6 +14,7 @@ import java.net.ServerSocket;
 public class VertxBasedTest {
 
     private static final String LOCALHOST = "http://localhost";
+    private static final String VERTX_CACHE_DIR = ".vertx";
 
     protected static Vertx vertx;
 
@@ -32,6 +33,7 @@ public class VertxBasedTest {
     protected static void stop(TestContext testContext) {
         RestAssured.reset();
         testContext.async().complete();
+        vertx.fileSystem().deleteRecursiveBlocking(VERTX_CACHE_DIR, true);
         vertx.close();
     }
 

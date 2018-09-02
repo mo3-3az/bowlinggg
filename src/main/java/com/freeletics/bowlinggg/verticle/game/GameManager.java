@@ -1,5 +1,7 @@
 package com.freeletics.bowlinggg.verticle.game;
 
+import com.freeletics.bowlinggg.verticle.game.exception.GameHasFinishedException;
+import com.freeletics.bowlinggg.verticle.game.exception.InvalidPinsNumberException;
 import com.freeletics.bowlinggg.verticle.game.model.Game;
 import com.freeletics.bowlinggg.verticle.game.store.GameStore;
 import com.freeletics.bowlinggg.verticle.game.store.InMemGameStore;
@@ -25,9 +27,13 @@ public class GameManager extends AbstractVerticle {
 
     private static final int FAILURE_CODE_GAME_NOT_FOUND = 404;
     private static final int FAILURE_CODE_INVALID_INPUT = 400;
+    private static final int FAILURE_CODE_GAME_HAS_FINISHED = 400;
+    private static final int FAILURE_CODE_INVALID_PINS_NUMBER = 400;
 
     private static final String EMPTY_MESSAGE = "";
     private static final String MSG_GAME_NOT_FOUND = "Game not found!";
+    private static final String MSG_GAME_HAS_FINISHED = "Game has finished!";
+    private static final String MSG_INVALID_PINS_NUMBER = "Invalid pins number!";
     private static final String MSG_INVALID_ACTION = "Invalid action!";
 
     private GameStore gameStore;
@@ -71,9 +77,16 @@ public class GameManager extends AbstractVerticle {
 
             case UPDATE_GAME:
                 final Game game = gameStore.getGame(id);
-                game.knockPins(Integer.parseInt(pins));
-                gameStore.updateGame(game);
-                event.reply(EMPTY_MESSAGE);
+                try {
+                    game.knockPins(Integer.parseInt(pins));
+                    gameStore.updateGame(game);
+                    event.reply(EMPTY_MESSAGE);
+                } catch (GameHasFinishedException e) {
+                    event.fail(FAILURE_CODE_GAME_HAS_FINISHED, MSG_GAME_HAS_FINISHED);
+                } catch (InvalidPinsNumberException e) {
+                    event.fail(FAILURE_CODE_INVALID_PINS_NUMBER, MSG_INVALID_PINS_NUMBER);
+                }
+
                 break;
 
             default:

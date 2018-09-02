@@ -1,5 +1,6 @@
 package com.freeletics.bowlinggg.verticle.game.model;
 
+import com.freeletics.bowlinggg.verticle.game.exception.GameHasFinishedException;
 import io.vertx.core.json.JsonObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -124,6 +125,40 @@ public class GameTest {
         //Perfect game
         Assert.assertEquals(290, game.getScore());
         Assert.assertEquals(Game.TOTAL_FRAMES + 1, game.getFramesCount());
+    }
+
+    @Test(expected = GameHasFinishedException.class)
+    public void gameMustFinishAtTenFramesIfLastFrameIsNotSpareOrNotStrike() {
+        for (int i = 0; i < 21; i++) {// 21 throws with not a single spare or strike frame
+            game.knockPins(1);
+        }
+    }
+
+    @Test(expected = GameHasFinishedException.class)
+    public void gameMustFinishAtElevenFramesIfLastFrameIsNotStrike() {
+        for (int i = 0; i < Game.TOTAL_FRAMES - 1; i++) {// 9 strikes!
+            game.knockPins(Frame.TOTAL_PINS);
+        }
+
+        //Last frame is a spare
+        game.knockPins(5);
+        game.knockPins(5);
+
+        //Only one more throw!
+        game.knockPins(5);
+
+        //This is not allowed!
+        game.knockPins(5);
+    }
+
+    @Test(expected = GameHasFinishedException.class)
+    public void gameMaximumFramesAreTwelve() {
+        for (int i = 0; i < Game.TOTAL_FRAMES + 2; i++) {// 12 strikes!
+            game.knockPins(Frame.TOTAL_PINS);
+        }
+
+        //This is not allowed!
+        game.knockPins(5);
     }
 
     @Test

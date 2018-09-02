@@ -1,5 +1,6 @@
 package com.freeletics.bowlinggg.verticle.game.model;
 
+import com.freeletics.bowlinggg.verticle.game.exception.InvalidPinsNumberException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,14 +64,14 @@ public class FrameTest {
         Assert.assertTrue("The frame has ended!", frame.hasEnded());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = InvalidPinsNumberException.class)
     public void frameEndsAfterTwoTries() {
         frame.knockPins(0);
         frame.knockPins(9);
         frame.knockPins(1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = InvalidPinsNumberException.class)
     public void knockingMoreThanTotalPinsIsNotAllowed() {
         frame.knockPins(Frame.TOTAL_PINS + 1);
     }

@@ -1,5 +1,7 @@
 package com.freeletics.bowlinggg.verticle.game.model;
 
+import com.freeletics.bowlinggg.verticle.game.exception.InvalidPinsNumberException;
+
 /**
  * This class represents a frame in a bowling game.
  *
@@ -16,11 +18,11 @@ class Frame {
 
     void knockPins(int knockedPins) {
         if (knockedPins > TOTAL_PINS) {
-            throw new IllegalArgumentException("There are only " + TOTAL_PINS + " pins!");
+            throw new InvalidPinsNumberException("There are only " + TOTAL_PINS + " pins!");
         }
 
         if (attempt == TOTAL_ATTEMPTS) {
-            throw new IllegalStateException("There are only " + TOTAL_ATTEMPTS + " attempts!");
+            throw new InvalidPinsNumberException("There are only " + TOTAL_ATTEMPTS + " attempts!");
         }
 
         attempt++;
