@@ -36,7 +36,7 @@ public class InMemGameStoreTest {
         Game game = inMemGameStore.newGame();
         Assert.assertEquals(FIRST_GAME_ID, game.getId());
 
-        game.pinsKnocked(10);
+        game.knockPins(10);
         inMemGameStore.updateGame(game);
 
         game = inMemGameStore.getGame(FIRST_GAME_ID);

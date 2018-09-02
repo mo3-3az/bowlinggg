@@ -10,14 +10,14 @@ public interface GameStore {
     Game newGame();
 
     /**
-     * This should delete the game which it's ID was passed and return it.
+     * This should delete the game which it's ID was passed.
      */
-    Game deleteGame(String id);
+    void deleteGame(String id);
 
     /**
-     * This should update the game which it's reference was passed and return it.
+     * This should update the game which it's reference was passed.
      */
-    Game updateGame(Game game);
+    void updateGame(Game game);
 
     /**
      * This should get the game which it's ID was passed and return it.

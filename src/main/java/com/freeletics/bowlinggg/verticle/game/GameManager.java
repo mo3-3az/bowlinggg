@@ -71,7 +71,7 @@ public class GameManager extends AbstractVerticle {
 
             case UPDATE_GAME:
                 final Game game = gameStore.getGame(id);
-                game.pinsKnocked(Integer.parseInt(pins));
+                game.knockPins(Integer.parseInt(pins));
                 gameStore.updateGame(game);
                 event.reply(EMPTY_MESSAGE);
                 break;

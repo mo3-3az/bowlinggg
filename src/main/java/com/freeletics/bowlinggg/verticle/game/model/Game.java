@@ -17,7 +17,6 @@ public class Game {
     private static final short MAX_FRAMES = 12;
 
     private String id;
-
     private int score;
     private int bonus;
     private int framesCount;
@@ -37,21 +36,24 @@ public class Game {
         return score;
     }
 
-    public void pinsKnocked(int pins) {
-        score += pins;
-        addPinsToPreviousFrame(pins);
+    public void knockPins(int pins) {
+        calculateScore(pins);
 
         currentFrame.knockPins(pins);
 
-        addBonusFromPreviousFrame();
+        addBonusFromCurrentFrame();
 
         checkIfFrameHasEnded();
     }
 
-    private void addBonusFromPreviousFrame() {
-        if (currentFrame.isStrike() && framesCount < TOTAL_FRAMES) {
+    private void addBonusFromCurrentFrame() {
+        if (framesCount > TOTAL_FRAMES) {
+            return;
+        }
+
+        if (currentFrame.isStrike()) {
             bonus += 2;
-        } else if (currentFrame.isSpare() && framesCount < TOTAL_FRAMES) {
+        } else if (currentFrame.isSpare()) {
             bonus++;
         }
     }
@@ -68,7 +70,9 @@ public class Game {
         }
     }
 
-    private void addPinsToPreviousFrame(int pins) {
+    private void calculateScore(int pins) {
+        score += pins;
+
         if (bonus == 0) {
             return;
         }

@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * This implementation stores games info in a in-memory concurrent map.
+ *
  * @author Moath
  */
 public class InMemGameStore implements GameStore {
@@ -29,13 +31,13 @@ public class InMemGameStore implements GameStore {
     }
 
     @Override
-    public Game deleteGame(String id) {
-        return games.remove(id);
+    public void deleteGame(String id) {
+        games.remove(id);
     }
 
     @Override
-    public Game updateGame(Game game) {
-        return games.put(game.getId(), game);
+    public void updateGame(Game game) {
+        games.put(game.getId(), game);
     }
 
     @Override

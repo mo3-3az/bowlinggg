@@ -19,7 +19,7 @@ public class GameTest {
 
     @Test
     public void knockingAllPinsOnFirstTryIsAStrike() {
-        game.pinsKnocked(Frame.TOTAL_PINS);
+        game.knockPins(Frame.TOTAL_PINS);
         Assert.assertEquals(1, game.getFramesCount());
 
         Assert.assertEquals(FrameType.STRIKE, game.getCurrentFrameType());
@@ -30,8 +30,8 @@ public class GameTest {
 
     @Test
     public void knockingAllPinsOnSecondTryIsASpare() {
-        game.pinsKnocked(0);
-        game.pinsKnocked(Frame.TOTAL_PINS);
+        game.knockPins(0);
+        game.knockPins(Frame.TOTAL_PINS);
         Assert.assertEquals(1, game.getFramesCount());
 
         Assert.assertEquals(FrameType.SPARE, game.getCurrentFrameType());
@@ -40,8 +40,8 @@ public class GameTest {
 
     @Test
     public void knockingAllPinsInTwoTriesIsASpare() {
-        game.pinsKnocked(5);
-        game.pinsKnocked(5);
+        game.knockPins(5);
+        game.knockPins(5);
         Assert.assertEquals(1, game.getFramesCount());
 
         Assert.assertEquals(FrameType.SPARE, game.getCurrentFrameType());
@@ -52,8 +52,8 @@ public class GameTest {
 
     @Test
     public void notKnockingAllPinsAfterTwoTriesIsNormalFrame() {
-        game.pinsKnocked(0);
-        game.pinsKnocked(0);
+        game.knockPins(0);
+        game.knockPins(0);
         Assert.assertEquals(1, game.getFramesCount());
 
         Assert.assertEquals(FrameType.NORMAL, game.getCurrentFrameType());
@@ -64,10 +64,10 @@ public class GameTest {
 
     @Test
     public void oneStrikeOneNormal() {
-        game.pinsKnocked(Frame.TOTAL_PINS);
+        game.knockPins(Frame.TOTAL_PINS);
 
-        game.pinsKnocked(5);
-        game.pinsKnocked(2);
+        game.knockPins(5);
+        game.knockPins(2);
 
         Assert.assertEquals(2, game.getFramesCount());
         Assert.assertEquals(24, game.getScore());
@@ -75,11 +75,11 @@ public class GameTest {
 
     @Test
     public void twoStrikesOneNormal() {
-        game.pinsKnocked(Frame.TOTAL_PINS);
-        game.pinsKnocked(Frame.TOTAL_PINS);
+        game.knockPins(Frame.TOTAL_PINS);
+        game.knockPins(Frame.TOTAL_PINS);
 
-        game.pinsKnocked(5);
-        game.pinsKnocked(2);
+        game.knockPins(5);
+        game.knockPins(2);
 
         Assert.assertEquals(3, game.getFramesCount());
         Assert.assertEquals(49, game.getScore());
@@ -91,15 +91,15 @@ public class GameTest {
     @Test
     public void strikeForEveryFrame() {
         for (int i = 0; i < Game.TOTAL_FRAMES; i++) {
-            game.pinsKnocked(Frame.TOTAL_PINS);
+            game.knockPins(Frame.TOTAL_PINS);
             Assert.assertTrue("Frame is a strike!", game.getCurrentFrameType().isStrike());
         }
 
         Assert.assertEquals(Game.TOTAL_FRAMES, game.getFramesCount());
 
         //Additional two throws
-        game.pinsKnocked(Frame.TOTAL_PINS);
-        game.pinsKnocked(Frame.TOTAL_PINS);
+        game.knockPins(Frame.TOTAL_PINS);
+        game.knockPins(Frame.TOTAL_PINS);
 
         //Perfect game
         Assert.assertEquals(300, game.getScore());
@@ -109,17 +109,17 @@ public class GameTest {
     @Test
     public void strikeForEveryFrameExceptSpareOnLast() {
         for (int i = 0; i < Game.TOTAL_FRAMES - 1; i++) {
-            game.pinsKnocked(Frame.TOTAL_PINS);
+            game.knockPins(Frame.TOTAL_PINS);
             Assert.assertTrue("Frame is a strike!", game.getCurrentFrameType().isStrike());
         }
 
         Assert.assertEquals(Game.TOTAL_FRAMES - 1, game.getFramesCount());
 
-        game.pinsKnocked(Frame.TOTAL_PINS - 1);
-        game.pinsKnocked(1);
+        game.knockPins(Frame.TOTAL_PINS - 1);
+        game.knockPins(1);
 
         //Additional one throw
-        game.pinsKnocked(Frame.TOTAL_PINS);
+        game.knockPins(Frame.TOTAL_PINS);
 
         //Perfect game
         Assert.assertEquals(290, game.getScore());
@@ -129,7 +129,7 @@ public class GameTest {
     @Test
     public void jsonConversion() {
         final Game game = new Game("1");
-        game.pinsKnocked(10);
+        game.knockPins(10);
         Assert.assertEquals(new JsonObject().put("game"
                 , new JsonObject()
                         .put("id", "1")

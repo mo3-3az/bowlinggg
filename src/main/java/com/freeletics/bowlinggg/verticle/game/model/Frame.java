@@ -1,6 +1,8 @@
 package com.freeletics.bowlinggg.verticle.game.model;
 
 /**
+ * This class represents a frame in a bowling game.
+ *
  * @author Moath
  */
 class Frame {
@@ -8,7 +10,7 @@ class Frame {
     static final short TOTAL_PINS = 10;
     private static final short TOTAL_ATTEMPTS = 2;
 
-    private int pinsOnFirstAttempt;
+    private int pinsKnockedOnFirstThrow;
     private int attempt;
     private FrameType frameType = FrameType.NORMAL;
 
@@ -23,7 +25,7 @@ class Frame {
 
         attempt++;
         if (attempt == 1) {
-            pinsOnFirstAttempt = knockedPins;
+            pinsKnockedOnFirstThrow = knockedPins;
             if (knockedPins == TOTAL_PINS) {
                 frameType = FrameType.STRIKE;
                 attempt++;
@@ -32,7 +34,7 @@ class Frame {
             return;
         }
 
-        if (pinsOnFirstAttempt + knockedPins == TOTAL_PINS) {
+        if (pinsKnockedOnFirstThrow + knockedPins == TOTAL_PINS) {
             frameType = FrameType.SPARE;
         }
     }
@@ -42,11 +44,11 @@ class Frame {
     }
 
     boolean isStrike() {
-        return frameType.isStrike();
+        return frameType == FrameType.STRIKE;
     }
 
     boolean isSpare() {
-        return frameType.isSpare();
+        return frameType == FrameType.SPARE;
     }
 
     boolean hasEnded() {
