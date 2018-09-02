@@ -106,8 +106,6 @@ public class GameTest {
         Assert.assertEquals(Game.TOTAL_FRAMES + 2, game.getFramesCount());
     }
 
-    ////////////// PERFECT 288 ////////////////////
-
     @Test
     public void strikeForEveryFrameExceptSpareOnLast() {
         for (int i = 0; i < Game.TOTAL_FRAMES - 1; i++) {
@@ -134,6 +132,7 @@ public class GameTest {
         game.pinsKnocked(10);
         Assert.assertEquals(new JsonObject().put("game"
                 , new JsonObject()
+                        .put("id", "1")
                         .put("score", 10)
                         .put("frame", "strike")
                         .put("frames", 1))

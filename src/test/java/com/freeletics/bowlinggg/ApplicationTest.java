@@ -1,6 +1,6 @@
 package com.freeletics.bowlinggg;
 
-import com.freeletics.bowlinggg.config.Addresses;
+import com.freeletics.bowlinggg.verticle.server.WebServer;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.apache.http.HttpStatus;
@@ -23,7 +23,7 @@ public class ApplicationTest extends VertxBasedTest {
 
     @Test
     public void healthCheck() {
-        get(Addresses.HEALTH_CHECK)
+        get(WebServer.HEALTH_CHECK)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK);

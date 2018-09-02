@@ -7,6 +7,12 @@ import io.vertx.core.json.JsonObject;
  */
 public class Game {
 
+    public static final String JSON_KEY_GAME = "game";
+    public static final String JSON_KEY_ID = "id";
+    public static final String JSON_KEY_SCORE = "score";
+    private static final String JSON_KEY_FRAME = "frame";
+    private static final String JSON_KEY_FRAMES = "frames";
+
     static final short TOTAL_FRAMES = 10;
     private static final short MAX_FRAMES = 12;
 
@@ -87,11 +93,12 @@ public class Game {
     }
 
     public String toJsonString() {
-        return new JsonObject().put("game"
+        return new JsonObject().put(JSON_KEY_GAME
                 , new JsonObject()
-                        .put("score", score)
-                        .put("frame", currentFrameType.name().toLowerCase())
-                        .put("frames", framesCount))
+                        .put(JSON_KEY_ID, id)
+                        .put(JSON_KEY_SCORE, score)
+                        .put(JSON_KEY_FRAME, currentFrameType.name().toLowerCase())
+                        .put(JSON_KEY_FRAMES, framesCount))
                 .encodePrettily();
     }
 

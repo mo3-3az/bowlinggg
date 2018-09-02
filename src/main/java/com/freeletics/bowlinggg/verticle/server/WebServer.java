@@ -1,8 +1,8 @@
 package com.freeletics.bowlinggg.verticle.server;
 
 
-import com.freeletics.bowlinggg.config.Addresses;
 import com.freeletics.bowlinggg.config.Config;
+import com.freeletics.bowlinggg.verticle.game.GameManager;
 import com.freeletics.bowlinggg.verticle.server.validate.ParamsValidator;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
@@ -30,6 +30,16 @@ public class WebServer extends AbstractVerticle {
 
     private static final Logger LOG = Logger.getLogger(WebServer.class);
 
+    public static final String HEALTH_CHECK = "/healthcheck";
+
+    private static final String API_VERSION = "/v1";
+    static final String GAMES_ENDPOINT = API_VERSION + "/games";
+    private static final String PARAM_ID = "id";
+    private static final String PATH_PART_PARAM_ID = "/:" + PARAM_ID;
+    private static final String PARAM_PINS = "pins";
+    private static final String PATH_PART_PARAM_PINS = "/:" + PARAM_PINS;
+    private static final String GAMES_ENDPOINT_FULL = GAMES_ENDPOINT + PATH_PART_PARAM_ID;
+
     private static final String NO_MESSAGE = null;
     private static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     private static final String MSG_INVALID_PINS_VALUE = "Invalid pins value!";
@@ -39,12 +49,12 @@ public class WebServer extends AbstractVerticle {
     public void start(Future<Void> future) {
         Router router = Router.router(vertx);
 
-        router.route(HttpMethod.GET, Addresses.HEALTH_CHECK).handler(context -> context.response().setStatusCode(HttpStatus.SC_OK).end());
+        router.route(HttpMethod.GET, HEALTH_CHECK).handler(context -> context.response().setStatusCode(HttpStatus.SC_OK).end());
 
-        router.route(HttpMethod.POST, Addresses.GAMES_ENDPOINT).handler(requestHandler());
-        router.route(HttpMethod.GET, Addresses.GAMES_ENDPOINT_FULL).handler(requestHandler());
-        router.route(HttpMethod.DELETE, Addresses.GAMES_ENDPOINT_FULL).handler(requestHandler());
-        router.route(HttpMethod.PUT, Addresses.GAMES_ENDPOINT_FULL + Addresses.PATH_PART_PARAM_PINS).handler(requestHandler());
+        router.route(HttpMethod.POST, GAMES_ENDPOINT).handler(requestHandler());
+        router.route(HttpMethod.GET, GAMES_ENDPOINT_FULL).handler(requestHandler());
+        router.route(HttpMethod.DELETE, GAMES_ENDPOINT_FULL).handler(requestHandler());
+        router.route(HttpMethod.PUT, GAMES_ENDPOINT_FULL + PATH_PART_PARAM_PINS).handler(requestHandler());
 
         vertx
                 .createHttpServer()
@@ -54,6 +64,7 @@ public class WebServer extends AbstractVerticle {
                         LOG.info(getClass().getSimpleName() + " was deployed successfully.");
                         future.complete();
                     } else {
+                        LOG.error(getClass().getSimpleName() + " wasn't deployed successfully.", result .cause());
                         future.fail(result.cause());
                     }
                 });
@@ -64,29 +75,29 @@ public class WebServer extends AbstractVerticle {
             final HttpServerRequest request = routingContext.request();
             final HttpMethod method = request.method();
             final DeliveryOptions deliveryOptions = new DeliveryOptions();
-            deliveryOptions.addHeader(Addresses.EVENT_BUS_MSG_HEADER_ACTION, method.name());
+            deliveryOptions.addHeader(GameManager.EVENT_BUS_MSG_HEADER_ACTION, method.name());
 
             if (HttpMethod.PUT.equals(method)) {
-                final String pins = request.getParam(Addresses.PARAM_PINS);
+                final String pins = request.getParam(PARAM_PINS);
                 if (ParamsValidator.invalidPins(pins)) {
                     replyWithError(routingContext.response(), MSG_INVALID_PINS_VALUE);
                     return;
                 }
 
-                deliveryOptions.addHeader(Addresses.PARAM_PINS, pins);
+                deliveryOptions.addHeader(PARAM_PINS, pins);
             }
 
             if (!HttpMethod.POST.equals(method)) {
-                final String id = request.getParam(Addresses.PARAM_ID);
+                final String id = request.getParam(PARAM_ID);
                 if (ParamsValidator.invalidId(id)) {
                     replyWithError(routingContext.response(), MSG_INVALID_ID_VALUE);
                     return;
                 }
 
-                deliveryOptions.addHeader(Addresses.PARAM_ID, id);
+                deliveryOptions.addHeader(PARAM_ID, id);
             }
 
-            vertx.eventBus().send(Addresses.EVENT_BUS_ADDRESS_GAMES_MANAGER, NO_MESSAGE, deliveryOptions, event -> reply(routingContext, event));
+            vertx.eventBus().send(GameManager.EVENT_BUS_ADDRESS_GAMES_MANAGER, NO_MESSAGE, deliveryOptions, event -> reply(routingContext, event));
         };
     }
 
@@ -107,6 +118,7 @@ public class WebServer extends AbstractVerticle {
 
             case POST:
                 statusCode = HttpStatus.SC_CREATED;
+                responseBody = event.result().body().toString();
                 break;
 
             case PUT:

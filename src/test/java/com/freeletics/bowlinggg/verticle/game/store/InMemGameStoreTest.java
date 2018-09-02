@@ -33,7 +33,14 @@ public class InMemGameStoreTest {
 
     @Test
     public void updateGame() {
-        //TODO: Implement
+        Game game = inMemGameStore.newGame();
+        Assert.assertEquals(FIRST_GAME_ID, game.getId());
+
+        game.pinsKnocked(10);
+        inMemGameStore.updateGame(game);
+
+        game = inMemGameStore.getGame(FIRST_GAME_ID);
+        Assert.assertEquals(10, game.getScore());
     }
 
     @Test

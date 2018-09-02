@@ -1,8 +1,8 @@
 package com.freeletics.bowlinggg.verticle.game;
 
 import com.freeletics.bowlinggg.VertxBasedTest;
-import com.freeletics.bowlinggg.config.Addresses;
 import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.TestOptions;
@@ -18,6 +18,16 @@ import java.io.IOException;
 @RunWith(VertxUnitRunner.class)
 public class GameManagerTest extends VertxBasedTest {
 
+    private static final String DELETE_GAME_TEST_CASE = "deleteGame";
+    private static final String GET_GAME_TEST_CASE = "getGame";
+    private static final String UPDATE_GAME_TEST_CASE = "updateGame";
+    private static final String START_NEW_GAME_TEST_CASE = "startNewGame";
+
+    private static final String NO_MESSAGE = null;
+
+    private static final String GAME_ID = "1";
+    private static final String ONE_PIN = "1";
+
     @BeforeClass
     public static void setup(TestContext testContext) throws IOException {
         start(testContext);
@@ -31,10 +41,10 @@ public class GameManagerTest extends VertxBasedTest {
         Async async4 = testContext.async();
 
         TestSuite.create(getClass().getSimpleName())
-                .test("startNewGame", event -> {
+                .test(START_NEW_GAME_TEST_CASE, event -> {
                     final DeliveryOptions deliveryOptions = new DeliveryOptions();
-                    deliveryOptions.addHeader(Addresses.EVENT_BUS_MSG_HEADER_ACTION, "POST");
-                    eventBus().send(Addresses.EVENT_BUS_ADDRESS_GAMES_MANAGER, null, deliveryOptions, newGameEvent -> {
+                    deliveryOptions.addHeader(GameManager.EVENT_BUS_MSG_HEADER_ACTION, HttpMethod.POST.name());
+                    eventBus().send(GameManager.EVENT_BUS_ADDRESS_GAMES_MANAGER, NO_MESSAGE, deliveryOptions, newGameEvent -> {
                         if (newGameEvent.failed()) {
                             testContext.fail(newGameEvent.cause().getMessage());
                         } else {
@@ -42,12 +52,12 @@ public class GameManagerTest extends VertxBasedTest {
                         }
                     });
                 })
-                .test("updateGame", event -> {
+                .test(UPDATE_GAME_TEST_CASE, event -> {
                     final DeliveryOptions deliveryOptions = new DeliveryOptions();
-                    deliveryOptions.addHeader(Addresses.EVENT_BUS_MSG_HEADER_ACTION, "PUT");
-                    deliveryOptions.addHeader(Addresses.PARAM_ID, "1");
-                    deliveryOptions.addHeader(Addresses.PARAM_PINS, "1");
-                    eventBus().send(Addresses.EVENT_BUS_ADDRESS_GAMES_MANAGER, null, deliveryOptions, updateGameEvent -> {
+                    deliveryOptions.addHeader(GameManager.EVENT_BUS_MSG_HEADER_ACTION, HttpMethod.PUT.name());
+                    deliveryOptions.addHeader(GameManager.HEADER_ID, GAME_ID);
+                    deliveryOptions.addHeader(GameManager.HEADER_PINS, ONE_PIN);
+                    eventBus().send(GameManager.EVENT_BUS_ADDRESS_GAMES_MANAGER, NO_MESSAGE, deliveryOptions, updateGameEvent -> {
                         async1.awaitSuccess();
                         if (updateGameEvent.failed()) {
                             testContext.fail(updateGameEvent.cause().getMessage());
@@ -56,11 +66,11 @@ public class GameManagerTest extends VertxBasedTest {
                         }
                     });
                 })
-                .test("getGame", event -> {
+                .test(GET_GAME_TEST_CASE, event -> {
                     final DeliveryOptions deliveryOptions = new DeliveryOptions();
-                    deliveryOptions.addHeader(Addresses.EVENT_BUS_MSG_HEADER_ACTION, "GET");
-                    deliveryOptions.addHeader(Addresses.PARAM_ID, "1");
-                    eventBus().send(Addresses.EVENT_BUS_ADDRESS_GAMES_MANAGER, null, deliveryOptions, getGameEvent -> {
+                    deliveryOptions.addHeader(GameManager.EVENT_BUS_MSG_HEADER_ACTION, HttpMethod.GET.name());
+                    deliveryOptions.addHeader(GameManager.HEADER_ID, GAME_ID);
+                    eventBus().send(GameManager.EVENT_BUS_ADDRESS_GAMES_MANAGER, NO_MESSAGE, deliveryOptions, getGameEvent -> {
                         async2.awaitSuccess();
                         if (getGameEvent.failed()) {
                             testContext.fail(getGameEvent.cause().getMessage());
@@ -73,11 +83,11 @@ public class GameManagerTest extends VertxBasedTest {
                         }
                     });
                 })
-                .test("deleteGame", event -> {
+                .test(DELETE_GAME_TEST_CASE, event -> {
                     final DeliveryOptions deliveryOptions = new DeliveryOptions();
-                    deliveryOptions.addHeader(Addresses.EVENT_BUS_MSG_HEADER_ACTION, "DELETE");
-                    deliveryOptions.addHeader(Addresses.PARAM_ID, "1");
-                    eventBus().send(Addresses.EVENT_BUS_ADDRESS_GAMES_MANAGER, null, deliveryOptions, deleteGameEvent -> {
+                    deliveryOptions.addHeader(GameManager.EVENT_BUS_MSG_HEADER_ACTION, HttpMethod.DELETE.name());
+                    deliveryOptions.addHeader(GameManager.HEADER_ID, GAME_ID);
+                    eventBus().send(GameManager.EVENT_BUS_ADDRESS_GAMES_MANAGER, NO_MESSAGE, deliveryOptions, deleteGameEvent -> {
                         async3.awaitSuccess();
                         if (deleteGameEvent.failed()) {
                             testContext.fail(deleteGameEvent.cause().getMessage());
