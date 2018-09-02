@@ -34,7 +34,7 @@ public class GameManagerTest extends VertxBasedTest {
                 .test("startNewGame", event -> {
                     final DeliveryOptions deliveryOptions = new DeliveryOptions();
                     deliveryOptions.addHeader(Addresses.EVENT_BUS_MSG_HEADER_ACTION, "POST");
-                    eventBus().send(Addresses.GAMES_ENDPOINT, null, deliveryOptions, newGameEvent -> {
+                    eventBus().send(Addresses.EVENT_BUS_ADDRESS_GAMES_MANAGER, null, deliveryOptions, newGameEvent -> {
                         if (newGameEvent.failed()) {
                             testContext.fail(newGameEvent.cause().getMessage());
                         } else {
@@ -47,7 +47,7 @@ public class GameManagerTest extends VertxBasedTest {
                     deliveryOptions.addHeader(Addresses.EVENT_BUS_MSG_HEADER_ACTION, "PUT");
                     deliveryOptions.addHeader(Addresses.PARAM_ID, "1");
                     deliveryOptions.addHeader(Addresses.PARAM_PINS, "1");
-                    eventBus().send(Addresses.GAMES_ENDPOINT, null, deliveryOptions, updateGameEvent -> {
+                    eventBus().send(Addresses.EVENT_BUS_ADDRESS_GAMES_MANAGER, null, deliveryOptions, updateGameEvent -> {
                         async1.awaitSuccess();
                         if (updateGameEvent.failed()) {
                             testContext.fail(updateGameEvent.cause().getMessage());
@@ -60,7 +60,7 @@ public class GameManagerTest extends VertxBasedTest {
                     final DeliveryOptions deliveryOptions = new DeliveryOptions();
                     deliveryOptions.addHeader(Addresses.EVENT_BUS_MSG_HEADER_ACTION, "GET");
                     deliveryOptions.addHeader(Addresses.PARAM_ID, "1");
-                    eventBus().send(Addresses.GAMES_ENDPOINT, null, deliveryOptions, getGameEvent -> {
+                    eventBus().send(Addresses.EVENT_BUS_ADDRESS_GAMES_MANAGER, null, deliveryOptions, getGameEvent -> {
                         async2.awaitSuccess();
                         if (getGameEvent.failed()) {
                             testContext.fail(getGameEvent.cause().getMessage());
@@ -77,7 +77,7 @@ public class GameManagerTest extends VertxBasedTest {
                     final DeliveryOptions deliveryOptions = new DeliveryOptions();
                     deliveryOptions.addHeader(Addresses.EVENT_BUS_MSG_HEADER_ACTION, "DELETE");
                     deliveryOptions.addHeader(Addresses.PARAM_ID, "1");
-                    eventBus().send(Addresses.GAMES_ENDPOINT, null, deliveryOptions, deleteGameEvent -> {
+                    eventBus().send(Addresses.EVENT_BUS_ADDRESS_GAMES_MANAGER, null, deliveryOptions, deleteGameEvent -> {
                         async3.awaitSuccess();
                         if (deleteGameEvent.failed()) {
                             testContext.fail(deleteGameEvent.cause().getMessage());

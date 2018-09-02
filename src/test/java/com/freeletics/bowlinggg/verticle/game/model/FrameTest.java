@@ -41,15 +41,6 @@ public class FrameTest {
     }
 
     @Test
-    public void getAttemptPins() {
-        frame.knockPins(1);
-        frame.knockPins(2);
-
-        Assert.assertEquals(1, frame.getPinsOnFirstAttempt());
-        Assert.assertEquals(2, frame.getPinsOnSecondAttempt());
-    }
-
-    @Test
     public void gettingAStrikeEndsTheFrame() {
         frame.knockPins(Frame.TOTAL_PINS);
 

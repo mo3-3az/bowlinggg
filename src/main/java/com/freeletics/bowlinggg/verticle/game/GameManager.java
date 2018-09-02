@@ -5,7 +5,6 @@ import com.freeletics.bowlinggg.verticle.game.model.Game;
 import com.freeletics.bowlinggg.verticle.game.store.GameStore;
 import com.freeletics.bowlinggg.verticle.game.store.InMemGameStore;
 import io.vertx.core.*;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import org.apache.log4j.Logger;
 
@@ -19,8 +18,13 @@ import org.apache.log4j.Logger;
 public class GameManager extends AbstractVerticle {
 
     private static final Logger LOG = Logger.getLogger(GameManager.class);
-    private static final int FAILURE_CODE_NOT_FOUND = 404;
+
+    private static final int FAILURE_CODE_GAME_NOT_FOUND = 404;
     private static final int FAILURE_CODE_INVALID_INPUT = 400;
+
+    private static final String EMPTY_MESSAGE = "";
+    private static final String MSG_GAME_NOT_FOUND = "Game not found!";
+    private static final String MSG_INVALID_ACTION = "Invalid action!";
 
     private GameStore gameStore;
 
@@ -32,63 +36,45 @@ public class GameManager extends AbstractVerticle {
 
     @Override
     public void start(Future<Void> startFuture) {
-        final EventBus eventBus = vertx.eventBus();
-
-        eventBus.localConsumer(Addresses.GAMES_ENDPOINT).handler(this::replyToMsg)
+        vertx
+                .eventBus()
+                .localConsumer(Addresses.EVENT_BUS_ADDRESS_GAMES_MANAGER)
+                .handler(this::replyToMsg)
                 .completionHandler(newGameConsumer -> chain(startFuture, newGameConsumer));
     }
 
     private void replyToMsg(Message<Object> event) {
-        String id = event.headers().get(Addresses.PARAM_ID);
+        final String id = event.headers().get(Addresses.PARAM_ID);
+        if (id != null && gameStore.getGame(id) == null) {
+            event.fail(FAILURE_CODE_GAME_NOT_FOUND, MSG_GAME_NOT_FOUND);
+            return;
+        }
+
         String pins = event.headers().get(Addresses.PARAM_PINS);
-        switch (GameManagerAction.fromHttpMethod(event.headers().get("action"))) {
+        switch (GameManagerAction.fromHttpMethod(event.headers().get(Addresses.EVENT_BUS_MSG_HEADER_ACTION))) {
             case CREATE_GAME:
                 gameStore.newGame();
-                event.reply("");
+                event.reply(EMPTY_MESSAGE);
                 break;
 
             case GET_GAME:
-                final Game gameById = gameStore.getGame(id);
-                if (gameById == null) {
-                    event.fail(FAILURE_CODE_NOT_FOUND, "Game not found!");
-                } else {
-                    event.reply(gameById.toJsonString());
-                }
+                event.reply(gameStore.getGame(id).toJsonString());
                 break;
 
             case DELETE_GAME:
-                final Game gameToDelete = gameStore.deleteGame(id);
-                if (gameToDelete == null) {
-                    event.fail(FAILURE_CODE_NOT_FOUND, "Game not found!");
-                } else {
-                    event.reply("");
-                }
-
+                gameStore.deleteGame(id);
+                event.reply(EMPTY_MESSAGE);
                 break;
 
             case UPDATE_GAME:
-                final Game gameToUpdate = gameStore.getGame(id);
-                if (gameToUpdate == null) {
-                    event.fail(FAILURE_CODE_NOT_FOUND, "Game not found!");
-                    return;
-                }
-
-                event.reply(gameToUpdate.getScore());
-                int pinsNumber;
-                try {
-                    pinsNumber = Integer.parseInt(pins);
-                } catch (NumberFormatException e) {
-                    event.fail(FAILURE_CODE_INVALID_INPUT, "Invalid pins value!");
-                    return;
-                }
-
-                gameToUpdate.pinsKnocked(pinsNumber);
-                gameStore.updateGame(gameToUpdate);
-                event.reply("");
+                final Game game = gameStore.getGame(id);
+                game.pinsKnocked(Integer.parseInt(pins));
+                gameStore.updateGame(game);
+                event.reply(EMPTY_MESSAGE);
                 break;
 
             default:
-                event.fail(FAILURE_CODE_INVALID_INPUT, "Invalid action!");
+                event.fail(FAILURE_CODE_INVALID_INPUT, MSG_INVALID_ACTION);
         }
     }
 
@@ -97,6 +83,7 @@ public class GameManager extends AbstractVerticle {
             LOG.info(getClass().getSimpleName() + " was deployed successfully.");
             startFuture.complete();
         } else {
+            LOG.error(getClass().getSimpleName() + " wasn't deployed successfully.", newGameConsumer.cause());
             startFuture.fail(newGameConsumer.cause());
         }
     }

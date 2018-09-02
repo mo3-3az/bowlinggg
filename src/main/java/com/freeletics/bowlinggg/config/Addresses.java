@@ -6,6 +6,7 @@ package com.freeletics.bowlinggg.config;
 public interface Addresses {
 
     String EVENT_BUS_MSG_HEADER_ACTION = "action";
+    String EVENT_BUS_ADDRESS_GAMES_MANAGER = "games-manager";
 
     String HEALTH_CHECK = "/healthcheck";
     String API_VERSION = "/v1";

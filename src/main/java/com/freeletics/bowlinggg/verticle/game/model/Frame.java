@@ -8,7 +8,6 @@ class Frame {
     static final short TOTAL_PINS = 10;
     private static final short TOTAL_ATTEMPTS = 2;
 
-    private int pinsOnSecondAttempt;
     private int pinsOnFirstAttempt;
     private int attempt;
     private FrameType frameType = FrameType.NORMAL;
@@ -33,9 +32,7 @@ class Frame {
             return;
         }
 
-        pinsOnSecondAttempt = knockedPins;
-
-        if (pinsOnFirstAttempt + pinsOnSecondAttempt == TOTAL_PINS) {
+        if (pinsOnFirstAttempt + knockedPins == TOTAL_PINS) {
             frameType = FrameType.SPARE;
         }
     }
@@ -50,14 +47,6 @@ class Frame {
 
     boolean isSpare() {
         return frameType.isSpare();
-    }
-
-    int getPinsOnSecondAttempt() {
-        return pinsOnSecondAttempt;
-    }
-
-    int getPinsOnFirstAttempt() {
-        return pinsOnFirstAttempt;
     }
 
     boolean hasEnded() {
